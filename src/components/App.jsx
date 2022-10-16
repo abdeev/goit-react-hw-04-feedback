@@ -1,69 +1,62 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import NoFeedback from './NoFeedback/NoFeedback';
 import Section from './Section/Section';
 import FeedbackOptions from './FeedbackOptions/FeedbackOptions';
 import Statistics from './Statistics/Statistics';
 import css from './App.module.css';
 
-export class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      good: 0,
-      neutral: 0,
-      bad: 0,
-    };
-  }
-  feedbackTitle = 'Please, leave your feedback!';
-  statisticTitle = '';
-  onLeaveFeedback = el => {
-    this.setState(prevState => {
-      return {
-        [el]: prevState[el] + 1,
-      };
-    });
+export const App = () => {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+
+  const stateMap = {
+    good: setGood,
+    neutral: setNeutral,
+    bad: setBad,
   };
-  countTotalFeedback = () => {
-    let totalFeedbacks = this.state.good + this.state.neutral + this.state.bad;
+  const feedbackTitle = 'Please, leave your feedback!';
+  const emptyFeedbackMessage = "There is no feedback's yet";
+  const statisticTitle = '';
+
+  const onLeaveFeedback = e => {
+    stateMap[e](prev => prev + 1);
+  };
+  const countTotalFeedback = () => {
+    let totalFeedbacks = good + neutral + bad;
     return totalFeedbacks;
   };
-  countPositiveFeedbackPercentage = () => {
-    let positivePercentage = Math.floor(
-      (this.state.good * 100) / this.countTotalFeedback()
-    );
+  const countPositiveFeedbackPercentage = () => {
+    let positivePercentage = Math.floor((good * 100) / countTotalFeedback());
     if (isNaN(positivePercentage)) {
       return 0;
     }
     return positivePercentage;
   };
 
-  render() {
-    const titleMessage = 'There is no feedback';
-    const { good, neutral, bad } = this.state;
-    return (
-      <div className={css.feedback_wrapper}>
-        <Section title={this.feedbackTitle}>
-          <FeedbackOptions
-            options={Object.keys(this.state)}
-            onLeavefeedback={this.onLeaveFeedback}
+  return (
+    <div className={css.feedback_wrapper}>
+      <Section title={feedbackTitle}>
+        <FeedbackOptions
+          options={Object.keys(stateMap)}
+          onLeavefeedback={onLeaveFeedback}
+        />
+      </Section>
+      {countTotalFeedback() === 0 ? (
+        <Section title="Current statistic:">
+          <NoFeedback message={emptyFeedbackMessage} />
+        </Section>
+      ) : (
+        <Section title={statisticTitle}>
+          <Statistics
+            goodValue={good}
+            neutralValue={neutral}
+            badValue={bad}
+            totalFeedbackValue={countTotalFeedback()}
+            percentageValue={countPositiveFeedbackPercentage()}
           />
         </Section>
-        {this.countTotalFeedback() === 0 ? (
-          <Section title="Current statistic:">
-            <NoFeedback message={titleMessage} />
-          </Section>
-        ) : (
-          <Section title={this.statisticTitle}>
-            <Statistics
-              goodValue={good}
-              neutralValue={neutral}
-              badValue={bad}
-              totalFeedbackValue={this.countTotalFeedback()}
-              percentageValue={this.countPositiveFeedbackPercentage()}
-            />
-          </Section>
-        )}
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
