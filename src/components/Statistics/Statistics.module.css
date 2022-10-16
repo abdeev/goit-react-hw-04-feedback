@@ -1,0 +1,20 @@
+.feedback_header {
+  text-align: center;
+}
+
+.statistic_container {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: fit-content;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgb(35, 35, 118);
+  background-color: azure;
+}
+
+.counter_total,
+.counter_percentage {
+  font-weight: 700;
+}
